@@ -15,6 +15,6 @@ Run
 Usage
 -----
 
-`curl "http://localhost:8080/?key=YOUR_SECRET_KEY&user=operator&pass=operator_pass"`
+`curl "http://localhost:8080/?key=YOUR_SECRET_KEY&name=operator&pass=operator_pass"`
 
 
