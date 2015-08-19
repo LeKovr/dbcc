@@ -30,20 +30,20 @@ clean:
 build:
 	@echo "*** $@ ***"
 	@pushd bin ; \
-	gox -osarch="$(OSARCH)" ../src/$(PRG) && popd || { popd ; exit 1 ; }
+	gox -osarch="$(OSARCH)" ../ && popd || { popd ; exit 1 ; }
 
 buildall:
 	@echo "*** $@ ***"
 	@pushd src/$(PRG) ; \
-	gox -osarch=$(ALLARCH) ../src/$(PRG) && popd || { popd ; exit 1 ; }
+	gox -osarch=$(ALLARCH) ../ && popd || { popd ; exit 1 ; }
 
 test:
 	@echo "*** $@ ***"
-	go test src/$(PRG)/*.go
+	go test
 
 testall:
 	@echo "*** $@ ***"
-	@PGUSER=$(DBUSER) DBCC_TEST_DB=1 go test -v src/$(PRG)/*.go
+	@PGUSER=$(DBUSER) DBCC_TEST_DB=1 go test
 
 sum:
 	@echo "*** $@ ***"
@@ -71,7 +71,7 @@ status:
 
 run: appkey
 	@echo "*** $@ ***"
-	@PGUSER=$(DBUSER) APP_KEY=$$(cat $(KEYFILE)) go run src/$(PRG)/{$(SRC_LIST)} -host $(HOST) -port $(PORT)
+	@PGUSER=$(DBUSER) APP_KEY=$$(cat $(KEYFILE)) go run {$(SRC_LIST)} -host $(HOST) -port $(PORT)
 
 use:
 	@echo "*** $@ ***"

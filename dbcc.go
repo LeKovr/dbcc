@@ -10,7 +10,6 @@ import (
 // Database check and create objects
 func DbCheckCreate(db *sql.DB, name, pass string) (ret int, err error) {
 	ret = 0
-	log.Println("incode")
 	if err = db.Ping(); err != nil {
 		return
 	}
