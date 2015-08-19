@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	name = "username"
-	pass = "userpass"
+	dbccTestName = "username"
+	dbccTestPass = "userpass"
 )
 
 // columns are prefixed with "o" since we used sqlstruct to generate them
@@ -25,7 +25,7 @@ func prepare(t *testing.T) *sql.DB {
 }
 
 func process(t *testing.T, db *sql.DB, ret int) {
-	status, err := DbCheckCreate(db, name, pass)
+	status, err := DbCheckCreate(db, dbccTestName, dbccTestPass)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s instead", err)
 	}
@@ -40,20 +40,20 @@ func process(t *testing.T, db *sql.DB, ret int) {
 
 func expectUser(values string) {
 	sqlmock.ExpectQuery("SELECT 1 FROM pg_roles WHERE rolname = (.+)").
-		WithArgs(name).
+		WithArgs(dbccTestName).
 		WillReturnRows(sqlmock.NewRows(columns).FromCSVString(values))
 }
 func createUser() {
-	sqlmock.ExpectExec(fmt.Sprintf("CREATE USER \"%s\" PASSWORD '%s'", name, pass)).
+	sqlmock.ExpectExec(fmt.Sprintf("CREATE USER \"%s\" PASSWORD '%s'", dbccTestName, dbccTestPass)).
 		WillReturnResult(sqlmock.NewResult(0, 1)) // no insert id, 1 affected row
 }
 func expectDb(values string) {
 	sqlmock.ExpectQuery("SELECT 1 FROM pg_database WHERE datname = (.+)").
-		WithArgs(name).
+		WithArgs(dbccTestName).
 		WillReturnRows(sqlmock.NewRows(columns).FromCSVString(values))
 }
 func createDb() {
-	sqlmock.ExpectExec(fmt.Sprintf("CREATE DATABASE \"%s\" OWNER \"%s\"", name, name)).
+	sqlmock.ExpectExec(fmt.Sprintf("CREATE DATABASE \"%s\" OWNER \"%s\"", dbccTestName, dbccTestName)).
 		WillReturnResult(sqlmock.NewResult(0, 1)) // no insert id, 1 affected row
 }
 

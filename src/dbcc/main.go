@@ -23,16 +23,15 @@ import (
 	"github.com/zenazn/goji/web"
 
 	"database/sql"
-	"github.com/lib/pq"
 )
 
-const Version = "1.1"
+const Version = "1.2"
 
 // https://elithrar.github.io/article/custom-handlers-avoiding-globals/
 
 type appContext struct {
-	config *cli.Context
-	db     *sql.DB
+	key string
+	db  *sql.DB
 }
 
 type appHandler struct {
@@ -66,7 +65,7 @@ func IndexHandler(a *appContext, w http.ResponseWriter, r *http.Request) (int, e
 	name := r.FormValue("name")
 
 	log.Printf("**** Request: key %s name %s", r.FormValue("key"), name)
-	if a.config.String("key") != r.FormValue("key") {
+	if a.key != r.FormValue("key") {
 		return http.StatusForbidden, errors.New("req: API key is absent or wrong")
 	} else if r.FormValue("name") == "" {
 		return http.StatusNotAcceptable, errors.New("req: name arg is required")
@@ -75,81 +74,46 @@ func IndexHandler(a *appContext, w http.ResponseWriter, r *http.Request) (int, e
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
+
 	fmt.Fprintf(w, "OK: %02b\n", status)
 	return 200, nil
 }
 
-// Database check and create objects
-func DbCheckCreate(db *sql.DB, name, pass string) (ret int, err error) {
-	ret = 0
-	if err = db.Ping(); err != nil {
-		return
-	}
-
-	var rows *sql.Rows
-	rows, err = db.Query("SELECT 1 FROM pg_roles WHERE rolname = $1", name)
-	if err != nil {
-		return
-	}
-
-	nameQuoted := pq.QuoteIdentifier(name)
-	if rows.Next() {
-		log.Printf("User %s already exists", name)
-	} else {
-		//    rows, err := db.Query("create user " + nameQuoted + " with password $1", r.FormValue("pass"))
-		_, err = db.Exec(fmt.Sprintf("CREATE USER %s PASSWORD '", nameQuoted) + pass + "'")
-		if err != nil {
-			return
-		}
-		log.Printf("User %s created", name)
-		ret += 1
-	}
-
-	rows, err = db.Query("SELECT 1 FROM pg_database WHERE datname = $1", name)
-	if err != nil {
-		return
-	}
-	if rows.Next() {
-		log.Printf("Database %s already exists", name)
-	} else {
-		_, err = db.Exec(fmt.Sprintf("CREATE DATABASE %s OWNER %s", nameQuoted, nameQuoted))
-		if err != nil {
-			return
-		}
-		log.Printf("Database %s created", name)
-		ret += 2
-	}
-	return //  ret, nil
-}
-
 func main() {
 
+	cli.NewApp()
 	app := cli.NewApp()
-	app.Name = "DBcc"
+	app.Name = "dbcc"
 	app.Version = Version
 	app.Author = "Alexey A. Kovrizhkin"
 	app.Email = "lekovr+dbcc@gmail.com"
 	app.Usage = "Check if database & user exists and create them if don't"
 
-	log.Printf("%s version: %s (%s on %s/%s; %s) compiled at %s", os.Args[0], Version, runtime.Version(), runtime.GOOS, runtime.GOARCH, runtime.Compiler, app.Compiled)
+	log.Printf("dbcc v %s (%s on %s/%s)", Version, runtime.Version(), runtime.GOOS, runtime.GOARCH)
+
 	app.Action = func(c *cli.Context) {
 
+		key := c.String("key")
+		if key == "" {
+			panic(errors.New("API key does not set"))
+		}
 		dbinfo := fmt.Sprintf("sslmode=disable")
 		db, err := sql.Open("postgres", dbinfo)
 		checkErr(nil, err)
 		defer db.Close()
 
-		addr := fmt.Sprintf("%s:%d", c.String("host"), c.Int("port"))
-		context := &appContext{config: c, db: db}
-
-		log.Printf("Start listening at %s%s with key %s", addr, c.String("prefix"), c.String("key"))
+		context := &appContext{key: key, db: db}
 
 		r := web.New()
-		// We pass an instance to our context pointer, and our handler.
 		r.Get(c.String("prefix"), appHandler{context, IndexHandler})
-		graceful.ListenAndServe(addr, r)
+
+		addr := fmt.Sprintf("%s:%d", c.String("host"), c.Int("port"))
+		log.Printf("Start listening at %s%s with key %s", addr, c.String("prefix"), c.String("key"))
+		err = graceful.ListenAndServe(addr, r)
+		checkErr(nil, err)
 
 	}
+
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "key, k",
@@ -175,6 +139,7 @@ func main() {
 			EnvVar: "APP_PREFIX,PREFIX",
 		},
 	}
+
 	app.Run(os.Args)
 
 }
