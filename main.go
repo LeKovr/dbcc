@@ -61,9 +61,9 @@ func (ah appHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Process args, check key, call DbCheckCreate
 func IndexHandler(a *appContext, w http.ResponseWriter, r *http.Request) (int, error) {
 	name := r.FormValue("name")
-	nameQuoted := pq.QuoteIdentifier(name)
 
 	log.Printf("**** Request: key %s name %s", r.FormValue("key"), name)
 	if a.config.String("key") != r.FormValue("key") {
@@ -71,25 +71,35 @@ func IndexHandler(a *appContext, w http.ResponseWriter, r *http.Request) (int, e
 	} else if r.FormValue("name") == "" {
 		return http.StatusNotAcceptable, errors.New("req: name arg is required")
 	}
-	db := a.db
-	err := db.Ping()
+	status, err := DbCheckCreate(a.db, name, r.FormValue("pass"))
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
+	fmt.Fprintf(w, "OK: %02b\n", status)
+	return 200, nil
+}
 
-	var ret = 0
-	rows, err := db.Query("SELECT 1 FROM pg_roles WHERE rolname = $1", name)
-	if err != nil {
-		return http.StatusInternalServerError, err
+// Database check and create objects
+func DbCheckCreate(db *sql.DB, name, pass string) (ret int, err error) {
+	ret = 0
+	if err = db.Ping(); err != nil {
+		return
 	}
 
+	var rows *sql.Rows
+	rows, err = db.Query("SELECT 1 FROM pg_roles WHERE rolname = $1", name)
+	if err != nil {
+		return
+	}
+
+	nameQuoted := pq.QuoteIdentifier(name)
 	if rows.Next() {
 		log.Printf("User %s already exists", name)
 	} else {
 		//    rows, err := db.Query("create user " + nameQuoted + " with password $1", r.FormValue("pass"))
-		_, err := db.Exec(fmt.Sprintf("CREATE USER %s PASSWORD '", nameQuoted) + r.FormValue("pass") + "'")
+		_, err = db.Exec(fmt.Sprintf("CREATE USER %s PASSWORD '", nameQuoted) + pass + "'")
 		if err != nil {
-			return http.StatusInternalServerError, err
+			return
 		}
 		log.Printf("User %s created", name)
 		ret += 1
@@ -97,20 +107,19 @@ func IndexHandler(a *appContext, w http.ResponseWriter, r *http.Request) (int, e
 
 	rows, err = db.Query("SELECT 1 FROM pg_database WHERE datname = $1", name)
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return
 	}
 	if rows.Next() {
 		log.Printf("Database %s already exists", name)
 	} else {
-		_, err := db.Exec(fmt.Sprintf("CREATE DATABASE %s OWNER %s", nameQuoted, nameQuoted))
+		_, err = db.Exec(fmt.Sprintf("CREATE DATABASE %s OWNER %s", nameQuoted, nameQuoted))
 		if err != nil {
-			return http.StatusInternalServerError, err
+			return
 		}
 		log.Printf("Database %s created", name)
 		ret += 2
 	}
-	fmt.Fprintf(w, "OK: %02b\n", ret)
-	return 200, nil
+	return //  ret, nil
 }
 
 func main() {

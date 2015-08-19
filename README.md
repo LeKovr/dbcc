@@ -1,6 +1,8 @@
 dbcc
 ====
 
+[![Build Status](https://drone.io/github.com/LeKovr/dbcc/status.png)](https://drone.io/github.com/LeKovr/dbcc/latest)
+
 Database check & create.
 
 Database superuser agent: Listen http port, check if given database & user exists and create them otherwise
