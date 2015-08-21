@@ -55,6 +55,7 @@ sum:
 	@pushd bin ; sha256sum $(PRG)* > SHA256SUMS ; popd
 
 get-deps:
+	go get github.com/mitchellh/gox
 	go get -t
 
 appkey:
