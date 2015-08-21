@@ -54,6 +54,9 @@ sum:
 	@[ -d bin ] || mkdir bin
 	@pushd bin ; sha256sum $(PRG)* > SHA256SUMS ; popd
 
+get-deps:
+	go get -t
+
 appkey:
 	@echo "*** $@ ***"
 	@[ -e $(KEYFILE) ] || { LC_ALL=C < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c$${1:-16} > $(KEYFILE) ; echo "$(KEYFILE) created." ; }
