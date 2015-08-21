@@ -34,7 +34,7 @@ build:
 
 buildall:
 	@echo "*** $@ ***"
-	@pushd src/$(PRG) ; \
+	@pushd bin ; \
 	gox -osarch=$(ALLARCH) ../ && popd || { popd ; exit 1 ; }
 
 test:
