@@ -26,14 +26,18 @@ chkgo:
 clean:
 	@echo "*** $@ ***"
 	@for f in bin/$(PRG)*; do [ -e "$$f" ] && rm "$$f" || echo "no files" ; done
+	@[ -d bin ] && [ -f bin/SHA256SUMS ] && rm bin/SHA256SUMS || true 
+	@[ -d bin ] && rm -d bin || true
 
 build:
 	@echo "*** $@ ***"
+	@[ -d bin ] || mkdir bin
 	@pushd bin ; \
 	gox -osarch="$(OSARCH)" ../ && popd || { popd ; exit 1 ; }
 
 buildall:
 	@echo "*** $@ ***"
+	@[ -d bin ] || mkdir bin
 	@pushd bin ; \
 	gox -osarch=$(ALLARCH) ../ && popd || { popd ; exit 1 ; }
 
@@ -47,6 +51,7 @@ testall:
 
 sum:
 	@echo "*** $@ ***"
+	@[ -d bin ] || mkdir bin
 	@pushd bin ; sha256sum $(PRG)* > SHA256SUMS ; popd
 
 appkey:

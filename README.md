@@ -1,7 +1,7 @@
 dbcc
 ====
 
-[![Build Status](https://drone.io/github.com/LeKovr/dbcc/status.png)](https://drone.io/github.com/LeKovr/dbcc/latest)
+[![Build Status](https://travis-ci.org/LeKovr/dbcc.svg?branch=master)](https://travis-ci.org/LeKovr/dbcc)  [![Build Status](https://drone.io/github.com/LeKovr/dbcc/status.png)](https://drone.io/github.com/LeKovr/dbcc/latest)
 
 Database check & create.
 
