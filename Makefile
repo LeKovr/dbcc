@@ -15,7 +15,7 @@ APPUSER  ?= appuser
 APPPASS  ?= apppass
 KEYFILE  ?= .appkey
 
-all: chkgo clean build sum
+all: chkgo clean build test sum
 
 dist: chkgo clean buildall sum
 
