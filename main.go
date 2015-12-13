@@ -25,7 +25,7 @@ import (
 	"database/sql"
 )
 
-const Version = "1.2"
+const Version = "1.3"
 
 // https://elithrar.github.io/article/custom-handlers-avoiding-globals/
 
@@ -95,7 +95,8 @@ func main() {
 
 		key := c.String("key")
 		if key == "" {
-			panic(errors.New("API key does not set"))
+			log.Println("Error: API key does not set")
+			os.Exit(1)
 		}
 		dbinfo := fmt.Sprintf("sslmode=disable")
 		db, err := sql.Open("postgres", dbinfo)

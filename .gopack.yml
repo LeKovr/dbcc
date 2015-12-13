@@ -1,0 +1,17 @@
+author: Alexey Kovrizhkin
+description: 'Database check & create.'
+os: darwin linux windows
+includes:
+  - README.md
+  - LICENSE
+  - conf
+  - templates
+  - public
+  - static
+  - views
+excludes:
+  - \.git
+  - bin
+script:
+  - go get -v
+  - go build
