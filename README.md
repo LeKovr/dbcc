@@ -11,6 +11,26 @@ This is a database superuser agent which listens http port, check if requested d
 
 Only postgresql database supported now.
 
+Make
+----
+
+`$ go build`
+
+If you need cross platform build with gox, run
+`$ make buildall`
+
+Tests
+-----
+
+With mock database:
+`$ go test`
+
+With real database server:
+```
+# set connection vars in ENV and run
+$ DBCC_TEST_DB=1 PGUSER=op go test
+```
+
 Run
 ---
 
