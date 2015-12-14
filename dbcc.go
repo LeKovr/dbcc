@@ -10,6 +10,11 @@ import (
 // Try to open database connection
 func DbInit() (db *sql.DB, err error) {
 	db, err = sql.Open("postgres", "sslmode=disable")
+	if err == nil {
+		db.SetMaxIdleConns(0)
+		// additional check
+		err = db.Ping()
+	}
 	return
 }
 
@@ -35,6 +40,7 @@ func DbCheckCreate(db *sql.DB, name, pass string) (ret int, err error) {
 		log.Printf("User %s created", name)
 		ret += 1
 	}
+	rows.Close()
 
 	rows, err = db.Query("SELECT 1 FROM pg_database WHERE datname = $1", name)
 	if err != nil {
@@ -50,5 +56,6 @@ func DbCheckCreate(db *sql.DB, name, pass string) (ret int, err error) {
 		log.Printf("Database %s created", name)
 		ret += 2
 	}
+	rows.Close()
 	return //  ret, nil
 }

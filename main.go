@@ -71,8 +71,8 @@ func IndexHandler(a *appContext, w http.ResponseWriter, r *http.Request) (int, e
 	var status int
 	db, err := DbInit()
 	if err == nil {
-		defer db.Close()
 		status, err = DbCheckCreate(db, name, r.FormValue("pass"))
+		db.Close()
 	}
 
 	if err != nil {
