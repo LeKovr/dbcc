@@ -21,17 +21,14 @@ import (
 
 	"github.com/zenazn/goji/graceful"
 	"github.com/zenazn/goji/web"
-
-	"database/sql"
 )
 
-const Version = "1.3"
+const Version = "1.4"
 
 // https://elithrar.github.io/article/custom-handlers-avoiding-globals/
 
 type appContext struct {
 	key string
-	db  *sql.DB
 }
 
 type appHandler struct {
@@ -70,7 +67,14 @@ func IndexHandler(a *appContext, w http.ResponseWriter, r *http.Request) (int, e
 	} else if r.FormValue("name") == "" {
 		return http.StatusNotAcceptable, errors.New("req: name arg is required")
 	}
-	status, err := DbCheckCreate(a.db, name, r.FormValue("pass"))
+
+	var status int
+	db, err := DbInit()
+	if err == nil {
+		defer db.Close()
+		status, err = DbCheckCreate(db, name, r.FormValue("pass"))
+	}
+
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -98,12 +102,13 @@ func main() {
 			log.Println("Error: API key does not set")
 			os.Exit(1)
 		}
-		dbinfo := fmt.Sprintf("sslmode=disable")
-		db, err := sql.Open("postgres", dbinfo)
-		checkErr(nil, err)
-		defer db.Close()
 
-		context := &appContext{key: key, db: db}
+		// Check if connect correct
+		db, err := DbInit()
+		checkErr(nil, err)
+		db.Close()
+
+		context := &appContext{key: key}
 
 		r := web.New()
 		r.Get(c.String("prefix"), appHandler{context, IndexHandler})

@@ -7,12 +7,15 @@ import (
 	"log"
 )
 
+// Try to open database connection
+func DbInit() (db *sql.DB, err error) {
+	db, err = sql.Open("postgres", "sslmode=disable")
+	return
+}
+
 // Database check and create objects
 func DbCheckCreate(db *sql.DB, name, pass string) (ret int, err error) {
 	ret = 0
-	if err = db.Ping(); err != nil {
-		return
-	}
 
 	var rows *sql.Rows
 	rows, err = db.Query("SELECT 1 FROM pg_roles WHERE rolname = $1", name)

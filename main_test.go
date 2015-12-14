@@ -56,7 +56,7 @@ func Test_main(t *testing.T) {
 	checkTestErr(t, err)
 	defer db.Close()
 
-	context := &appContext{key: testKey, db: db}
+	context := &appContext{key: testKey}
 
 	s := web.New()
 	s.Get("/", appHandler{context, IndexHandler})
