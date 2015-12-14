@@ -25,7 +25,8 @@ chkgo:
 
 clean:
 	@echo "*** $@ ***"
-	@for f in bin/$(PRG)*; do [ -e "$$f" ] && rm "$$f" || echo "no files" ; done
+	@for f in bin/$(PRG)*; do [ -e "$$f" ] && rm "$$f" || echo "no bin files" ; done
+	@for f in $(PRG)*.zip; do [ -e "$$f" ] && rm "$$f" || echo "no zip files" ; done
 	@[ -d bin ] && [ -f bin/SHA256SUMS ] && rm bin/SHA256SUMS || true 
 	@[ -d bin ] && rm -d bin || true
 
@@ -40,6 +41,11 @@ buildall:
 	@[ -d bin ] || mkdir bin
 	@pushd bin ; \
 	gox -osarch=$(ALLARCH) ../ && popd || { popd ; exit 1 ; }
+
+buildpack:
+	@echo "*** $@ ***"
+	@pushd bin ; \
+	for f in $(PRG)* ; do [ -e "$$f" ] && zip "../$$f.zip" "$$f" || echo "no files" ; done
 
 test:
 	@echo "*** $@ ***"
