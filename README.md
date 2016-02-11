@@ -1,13 +1,27 @@
 dbcc
 ====
 
-[![Build Status](https://travis-ci.org/LeKovr/dbcc.svg?branch=master)](https://travis-ci.org/LeKovr/dbcc) 
- [![Build Status](https://drone.io/github.com/LeKovr/dbcc/status.png)](https://drone.io/github.com/LeKovr/dbcc/latest)
- [![gorelease](https://dn-gorelease.qbox.me/gorelease-download-blue.svg)](http://gorelease.herokuapp.com/LeKovr/dbcc/master)
+[![Build Status][1]][2]
+[![Build Status][3]][4]
+[![GoRelease][5]][6]
+[![GoCard][7]][8]
+
+[1]: https://travis-ci.org/LeKovr/dbcc.svg?branch=master
+[2]: https://travis-ci.org/LeKovr/dbcc
+[3]: https://drone.io/github.com/LeKovr/dbcc/status.png
+[4]: https://drone.io/github.com/LeKovr/dbcc/latest
+[5]: https://dn-gorelease.qbox.me/gorelease-download-blue.svg
+[6]: http://gorelease.herokuapp.com/LeKovr/dbcc/master
+[7]: https://goreportcard.com/badge/LeKovr/dbcc
+[8]: https://goreportcard.com/report/github.com/LeKovr/dbcc
 
 [dbcc](https://github.com/LeKovr/dbcc) - Database check & create tool.
 
-This is a database superuser agent which listens http port, check if requested database & user exists and create them otherwise.
+This is a database superuser agent which 
+
+* listens http port
+* gets authorized requests with `name`
+* check if requested database `name` & user `name` exists and create them otherwise.
 
 Only postgresql database supported now.
 
