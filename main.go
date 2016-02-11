@@ -23,7 +23,8 @@ import (
 	"github.com/zenazn/goji/web"
 )
 
-const Version = "1.4"
+// Version of this program
+const Version = "1.5"
 
 // https://elithrar.github.io/article/custom-handlers-avoiding-globals/
 
@@ -57,7 +58,7 @@ func (ah appHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Process args, check key, call DbCheckCreate
+// IndexHandler - process args, check key, call DbCheckCreate
 func IndexHandler(a *appContext, w http.ResponseWriter, r *http.Request) (int, error) {
 	name := r.FormValue("name")
 

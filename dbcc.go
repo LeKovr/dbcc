@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-// Try to open database connection
+// DbInit - try to open database connection
 func DbInit() (db *sql.DB, err error) {
 	db, err = sql.Open("postgres", "sslmode=disable")
 	if err == nil {
@@ -18,7 +18,7 @@ func DbInit() (db *sql.DB, err error) {
 	return
 }
 
-// Database check and create objects
+// DbCheckCreate - database check and create objects
 func DbCheckCreate(db *sql.DB, name, pass string) (ret int, err error) {
 	ret = 0
 
@@ -38,7 +38,7 @@ func DbCheckCreate(db *sql.DB, name, pass string) (ret int, err error) {
 			return
 		}
 		log.Printf("User %s created", name)
-		ret += 1
+		ret++
 	}
 	rows.Close()
 

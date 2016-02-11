@@ -34,7 +34,7 @@ func process(t *testing.T, db *sql.DB, ret int) {
 		t.Errorf("Error '%s' was not expected while closing the database", err)
 	}
 	if status != ret {
-		t.Error(fmt.Sprintf("Expected status %d, got %d", ret, status))
+		t.Errorf("Expected status %d, got %d", ret, status)
 	}
 }
 
