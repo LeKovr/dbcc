@@ -67,8 +67,7 @@ Will do the following:
 and return
 
 * `OK: 00` if nothing was done
-* `OK: 10` if user created
-* `OK: 01` if db created
+* `OK: 10` if db created (user exists)
 * `OK: 11` if user & db created
 
 License

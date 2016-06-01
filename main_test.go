@@ -27,8 +27,8 @@ var httpTests = []struct {
 	{1, false, "/", "403 - Forbidden"},                             // API key is absent or wrong (absent)
 	{2, false, "/?key=XX", "403 - Forbidden"},                      // API key is absent or wrong (wrong)
 	{3, false, "/?key=" + testKey, "406 - Not Acceptable"},         // name arg is required
-	{4, true, fmt.Sprintf(testURIFmt, testKey, 0), "200 - OK: 11"}, // no user, no db
-	{5, true, fmt.Sprintf(testURIFmt, testKey, 1), "200 - OK: 10"}, // user exists, no db
+	{4, true, fmt.Sprintf(testURIFmt, testKey, 0), "200 - OK: 11"}, // db created, user created
+	{5, true, fmt.Sprintf(testURIFmt, testKey, 1), "200 - OK: 10"}, // db created, user exists
 	{6, true, fmt.Sprintf(testURIFmt, testKey, 2), "200 - OK: 00"}, // user & db exists
 }
 
