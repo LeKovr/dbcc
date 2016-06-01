@@ -72,7 +72,7 @@ func IndexHandler(a *appContext, w http.ResponseWriter, r *http.Request) (int, e
 	var status int
 	db, err := DbInit()
 	if err == nil {
-		status, err = DbCheckCreate(db, name, r.FormValue("pass"))
+		status, err = DbCheckCreate(db, name, r.FormValue("pass"), r.FormValue("tmpl"))
 		db.Close()
 	}
 

@@ -10,6 +10,7 @@ import (
 const (
 	dbccTestName = "username"
 	dbccTestPass = "userpass"
+	dbccTestTmpl = "template"
 )
 
 // columns are prefixed with "o" since we used sqlstruct to generate them
@@ -24,8 +25,8 @@ func prepare(t *testing.T) *sql.DB {
 	return db
 }
 
-func process(t *testing.T, db *sql.DB, ret int) {
-	status, err := DbCheckCreate(db, dbccTestName, dbccTestPass)
+func process(t *testing.T, db *sql.DB, tmpl string, ret int) {
+	status, err := DbCheckCreate(db, dbccTestName, dbccTestPass, tmpl)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s instead", err)
 	}
@@ -52,8 +53,11 @@ func expectDb(values string) {
 		WithArgs(dbccTestName).
 		WillReturnRows(sqlmock.NewRows(columns).FromCSVString(values))
 }
-func createDb() {
-	sqlmock.ExpectExec(fmt.Sprintf("CREATE DATABASE \"%s\" OWNER \"%s\"", dbccTestName, dbccTestName)).
+func createDb(tmpl string) {
+	if tmpl == "" {
+		tmpl = "template1"
+	}
+	sqlmock.ExpectExec(fmt.Sprintf("CREATE DATABASE \"%s\" OWNER \"%s\" TEMPLATE \"%s\"", dbccTestName, dbccTestName, tmpl)).
 		WillReturnResult(sqlmock.NewResult(0, 1)) // no insert id, 1 affected row
 }
 
@@ -63,8 +67,8 @@ func TestFull_DbCheckCreate(t *testing.T) {
 	expectUser("")
 	createUser()
 	expectDb("")
-	createDb()
-	process(t, db, 3)
+	createDb("")
+	process(t, db, "", 3)
 }
 
 // will test that only database will be created
@@ -72,8 +76,17 @@ func TestDb_DbCheckCreate(t *testing.T) {
 	db := prepare(t)
 	expectUser("1")
 	expectDb("")
-	createDb()
-	process(t, db, 2)
+	createDb("")
+	process(t, db, "", 2)
+}
+
+// will test that database will be created with different template
+func TestDb_DbCheckCreateTmpl(t *testing.T) {
+	db := prepare(t)
+	expectUser("1")
+	expectDb("")
+	createDb(dbccTestTmpl)
+	process(t, db, dbccTestTmpl, 2)
 }
 
 // will test that nothing will be created
@@ -81,5 +94,5 @@ func TestNothing_DbCheckCreate(t *testing.T) {
 	db := prepare(t)
 	expectUser("1")
 	expectDb("1")
-	process(t, db, 0)
+	process(t, db, "", 0)
 }

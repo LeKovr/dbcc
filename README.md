@@ -57,12 +57,12 @@ or
 Usage
 -----
 
-`curl "http://$DB_HOST:8080/?key=YOUR_SECRET_KEY&name=operator&pass=operator_pass"`
+`curl "http://$DB_HOST:8080/?key=YOUR_SECRET_KEY&name=operator&pass=operator_pass[&tmpl=template]"`
 
 Will do the following:
 
 * if user `operator` does not exists then create it with password `operator_pass`
-* if database `operator` does not exists then create it with owner `operator`
+* if database `operator` does not exists then create it with owner `operator` and template `template` (default template1)
 
 and return
 

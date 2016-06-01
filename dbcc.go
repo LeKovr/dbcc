@@ -19,7 +19,7 @@ func DbInit() (db *sql.DB, err error) {
 }
 
 // DbCheckCreate - database check and create objects
-func DbCheckCreate(db *sql.DB, name, pass string) (ret int, err error) {
+func DbCheckCreate(db *sql.DB, name, pass, tmpl string) (ret int, err error) {
 	ret = 0
 
 	var rows *sql.Rows
@@ -49,7 +49,11 @@ func DbCheckCreate(db *sql.DB, name, pass string) (ret int, err error) {
 	if rows.Next() {
 		log.Printf("Database %s already exists", name)
 	} else {
-		_, err = db.Exec(fmt.Sprintf("CREATE DATABASE %s OWNER %s", nameQuoted, nameQuoted))
+		if tmpl == "" {
+			tmpl = "template1"
+		}
+		tmplQuoted := pq.QuoteIdentifier(tmpl)
+		_, err = db.Exec(fmt.Sprintf("CREATE DATABASE %s OWNER %s TEMPLATE %s", nameQuoted, nameQuoted, tmplQuoted))
 		if err != nil {
 			return
 		}
