@@ -24,7 +24,7 @@ import (
 )
 
 // Version of this program
-const Version = "1.5"
+const Version = "1.6"
 
 // https://elithrar.github.io/article/custom-handlers-avoiding-globals/
 
